@@ -78,7 +78,10 @@ def login_user(
             detail="Invalid email or password"
         )
 
-    access_token = create_access_token(user.id)
+    access_token = create_access_token(
+        user.id,
+        user.role
+        )
 
     return {
         "access_token": access_token,

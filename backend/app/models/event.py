@@ -1,6 +1,14 @@
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, DateTime, Float, Integer, String, Text
+from sqlalchemy import (
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text
+)
 
 from app.database.connection import Base
 
@@ -8,7 +16,11 @@ from app.database.connection import Base
 class Event(Base):
     __tablename__ = "events"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
 
     title = Column(
         String(200),
@@ -49,6 +61,18 @@ class Event(Base):
     banner_image = Column(
         String(500),
         nullable=True
+    )
+
+    organizer_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=True
+    )
+
+    event_status = Column(
+        String(20),
+        nullable=False,
+        default="UPCOMING"
     )
 
     created_at = Column(

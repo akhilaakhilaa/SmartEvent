@@ -1,20 +1,20 @@
 from datetime import datetime, timedelta, timezone
+import os
 
-from jose import JWTError, jwt
+from dotenv import load_dotenv
+from jose import jwt
 from passlib.context import CryptContext
 
-from app.database.connection import SessionLocal
-from app.models.user import User
-import os
-from dotenv import load_dotenv
 
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
+
 ACCESS_TOKEN_EXPIRE_MINUTES = int(
     os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
 )
+
 
 pwd_context = CryptContext(
     schemes=["bcrypt"],
@@ -36,13 +36,18 @@ def verify_password(
     )
 
 
-def create_access_token(user_id: int) -> str:
+def create_access_token(
+    user_id: int,
+    role: str
+) -> str:
+
     expire = datetime.now(timezone.utc) + timedelta(
         minutes=ACCESS_TOKEN_EXPIRE_MINUTES
     )
 
     payload = {
         "sub": str(user_id),
+        "role": role,
         "exp": expire
     }
 

@@ -43,6 +43,10 @@ class EventResponse(BaseModel):
     ticket_price: float
     available_tickets: int
     banner_image: str | None
+
+    organizer_id: int | None
+    event_status: str
+
     created_at: datetime
 
     class Config:

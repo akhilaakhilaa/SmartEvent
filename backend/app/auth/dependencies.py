@@ -3,9 +3,9 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
+from app.auth.security import SECRET_KEY, ALGORITHM
 from app.database.connection import get_db
 from app.models.user import User
-from app.auth.security import SECRET_KEY, ALGORITHM
 
 
 security = HTTPBearer()
@@ -40,7 +40,11 @@ def get_current_user(
             detail="Invalid or expired token"
         )
 
-    user = db.query(User).filter(User.id == user_id).first()
+    user = (
+        db.query(User)
+        .filter(User.id == user_id)
+        .first()
+    )
 
     if user is None:
         raise HTTPException(
@@ -49,3 +53,19 @@ def get_current_user(
         )
 
     return user
+
+
+def require_role(required_role: str):
+
+    def role_checker(
+        current_user: User = Depends(get_current_user)
+    ):
+        if current_user.role != required_role:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to access this resource"
+            )
+
+        return current_user
+
+    return role_checker

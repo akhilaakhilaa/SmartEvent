@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from app.routers import admin
 
 from app.database.connection import Base, engine
 
@@ -40,6 +41,7 @@ app.include_router(event_router)
 app.include_router(booking_router)
 app.include_router(ticket_router)
 app.include_router(notification_router)
+app.include_router(admin.router)
 
 
 app.mount(

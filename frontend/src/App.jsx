@@ -2,7 +2,9 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
 
 import Navbar from "./components/Navbar";
+import AdminDashboard from "./pages/AdminDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import OrganizerDashboard from "./pages/OrganizerDashboard";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -29,6 +31,10 @@ function App() {
         <Route
           path="/events/:eventId"
           element={<EventDetails />}
+        />
+        <Route
+          path="/organizer/dashboard"
+          element={<OrganizerDashboard />}
         />
 
         <Route
@@ -65,6 +71,10 @@ function App() {
               <Tickets />
             </ProtectedRoute>
           }
+        />
+        <Route
+          path="/admin/dashboard"
+          element={<AdminDashboard />}
         />
 
         <Route
