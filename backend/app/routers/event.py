@@ -10,7 +10,9 @@ from app.auth.dependencies import require_role
 from app.database.connection import get_db
 from app.models.event import Event
 from app.models.user import User
+from app.utils.notifications import add_notification
 from app.models.booking import Booking
+from app.models.notification import Notification
 from app.schemas.event import EventCreate, EventResponse
 
 router = APIRouter(prefix="/events", tags=["Events"])
@@ -39,6 +41,7 @@ def update_event_status(event):
     return event
 
 
+
 @router.post(
     "",
     response_model=EventResponse,
@@ -64,22 +67,117 @@ def create_event(
         event_status="UPCOMING"
     )
 
-    db.add(new_event)
-    db.commit()
-    db.refresh(new_event)
+    try:
+        db.add(new_event)
+        db.flush()
 
-    return new_event
+        add_notification(
+            db=db,
+            user_id=current_user.id,
+            title="Event Created Successfully",
+            message=f"Your event '{new_event.title}' has been created.",
+            notification_type="EVENT"
+        )
+
+        db.commit()
+        db.refresh(new_event)
+        return new_event
+
+    except Exception:
+        db.rollback()
+        raise
+
 
 
 @router.get("", response_model=list[EventResponse])
-def get_events(db: Session = Depends(get_db)):
-    events = db.query(Event).all()
+def get_events(
+    search: str | None = None,
+    category: str | None = None,
+    location: str | None = None,
+    start_date: datetime | None = None,
+    end_date: datetime | None = None,
+    sort_by: str = "date",
+    order: str = "asc",
+    db: Session = Depends(get_db)
+):
+    query = db.query(Event)
+
+    # Search by event name, category, or location
+    if search and search.strip():
+        term = f"%{search.strip()}%"
+        query = query.filter(
+            (Event.title.ilike(term))
+            | (Event.category.ilike(term))
+            | (Event.location.ilike(term))
+        )
+
+    # Filter by category
+    if category and category.strip():
+        query = query.filter(
+            Event.category.ilike(category.strip())
+        )
+
+    # Filter by location
+    if location and location.strip():
+        query = query.filter(
+            Event.location.ilike(f"%{location.strip()}%")
+        )
+
+    # Filter by date range
+    if start_date:
+        query = query.filter(Event.event_date >= start_date)
+
+    if end_date:
+        query = query.filter(Event.event_date <= end_date)
+
+    # Sort by date, price, or popularity (ticket sales)
+    if sort_by == "popularity":
+        popularity_query = (
+            db.query(
+                Booking.event_id,
+                func.coalesce(
+                    func.sum(Booking.ticket_quantity), 0
+                ).label("tickets_sold")
+            )
+            .filter(Booking.booking_status == "CONFIRMED")
+            .group_by(Booking.event_id)
+            .subquery()
+        )
+
+        query = query.outerjoin(
+            popularity_query,
+            Event.id == popularity_query.c.event_id
+        )
+
+        sort_column = func.coalesce(
+            popularity_query.c.tickets_sold, 0
+        )
+    elif sort_by == "price":
+        sort_column = Event.ticket_price
+    elif sort_by == "date":
+        sort_column = Event.event_date
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="sort_by must be date, price, or popularity"
+        )
+
+    if order.lower() == "desc":
+        query = query.order_by(sort_column.desc())
+    elif order.lower() == "asc":
+        query = query.order_by(sort_column.asc())
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="order must be asc or desc"
+        )
+
+    events = query.all()
 
     for event in events:
         update_event_status(event)
 
     db.commit()
-
     return events
 
 

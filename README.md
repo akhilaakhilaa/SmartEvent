@@ -1,690 +1,299 @@
-# SmartEvent 🎉
-
-SmartEvent is an Event Discovery and Ticket Booking System built using FastAPI and React.
-
-The application allows users to discover upcoming events, search and filter events, book tickets, receive QR-based tickets, view booking history, and receive booking notifications. It also includes role-based access, organizer event management, event status tracking, and an admin dashboard for analytics.
-
----
-
-## 📌 Project Overview
-
-SmartEvent provides an event booking experience with:
-
-- User registration and login
-- JWT-based authentication
-- Role-based access control
-- Protected user routes
-- Event discovery, search, and category filtering
-- Event details and ticket availability
-- Ticket booking and booking history
-- Unique ticket codes and QR code generation
-- User notifications
-- Organizer event management
-- Organizer dashboard and booking insights
-- Event status management
-- Event cancellation and related notifications
-- Admin dashboard and analytics
-- User, event, booking, and revenue statistics
-- React-based frontend
-
----
-
-## 🛠️ Technologies Used
-
-### Backend
-
-- Python
-- FastAPI
-- SQLAlchemy
-- SQLite
-- Pydantic
-- JWT Authentication
-- Passlib
-- Bcrypt
-- Uvicorn
-- Python-dotenv
-- QRCode
-
-### Frontend
-
-- React
-- Vite
-- JavaScript
-- Axios
-- React Router
-- CSS
-
----
-
-## 📂 Project Structure
-
-```text
+SmartEvent 🎉
+SmartEvent is an event discovery and ticket-booking web application
+built with FastAPI, React, and SQLite. Users can explore
+events, search and filter listings, book tickets, complete payments
+through Stripe Checkout, and access digital tickets with unique ticket
+codes and QR codes.
+The project also includes JWT authentication, role-based access,
+organizer event management, event-status handling, notifications, and an
+admin dashboard with analytics.
+📌 Features
+User experience
+User registration and login
+JWT-based authentication and protected routes
+Browse events and view event details
+Search events and filter by category, location, and date
+Sort event listings
+Check ticket availability
+Book tickets and view booking history
+Apply coupon codes and view discounts
+Complete checkout using Stripe test payments
+View payment and booking status
+Access digital tickets with unique ticket codes and QR codes
+Receive booking, payment, and event-related notifications
+Responsive interface for desktop and mobile layouts
+Organizer features
+Organizer dashboard
+Create and manage permitted events
+Update event information and event status
+Review event-related bookings and insights
+Admin features
+Admin dashboard and analytics
+Overview of users, events, bookings, tickets sold, and revenue
+Sales and booking trends
+Date-based sales filtering
+Popular events and revenue information
+🛠️ Technology Stack
+Backend
+Python
+FastAPI
+SQLAlchemy
+SQLite
+Pydantic
+JWT authentication
+Passlib and bcrypt
+Uvicorn
+Python-dotenv
+QR code generation
+Stripe payment integration
+Frontend
+React
+Vite
+JavaScript
+Axios
+React Router
+CSS
+📂 Project Structure
+``` text
 SmartEvent/
-│
 ├── backend/
 │   ├── app/
 │   │   ├── auth/
-│   │   │   ├── dependencies.py
-│   │   │   ├── router.py
-│   │   │   ├── schemas.py
-│   │   │   └── security.py
-│   │   │
 │   │   ├── database/
-│   │   │   └── connection.py
-│   │   │
 │   │   ├── models/
-│   │   │   ├── user.py
-│   │   │   ├── event.py
-│   │   │   ├── booking.py
-│   │   │   ├── ticket.py
-│   │   │   └── notification.py
-│   │   │
 │   │   ├── routers/
-│   │   │   ├── event.py
-│   │   │   ├── booking.py
-│   │   │   ├── ticket.py
-│   │   │   ├── notification.py
-│   │   │   └── admin.py
-│   │   │
 │   │   ├── schemas/
-│   │   │   ├── event.py
-│   │   │   ├── booking.py
-│   │   │   ├── ticket.py
-│   │   │   └── notification.py
-│   │   │
 │   │   ├── utils/
-│   │   │   └── qr.py
-│   │   │
 │   │   ├── static/
-│   │   │   └── qr/
-│   │   │
 │   │   └── main.py
-│   │
 │   ├── requirements.txt
 │   └── smartevent.db
-│
 ├── frontend/
 │   ├── public/
 │   │   └── events/
-│   │
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── EventCard.jsx
-│   │   │   ├── Navbar.jsx
-│   │   │   └── ProtectedRoute.jsx
-│   │   │
 │   │   ├── context/
-│   │   │   └── AuthContext.jsx
-│   │   │
 │   │   ├── pages/
-│   │   │   ├── Login.jsx
-│   │   │   ├── Register.jsx
-│   │   │   ├── Home.jsx
-│   │   │   ├── EventDetails.jsx
-│   │   │   ├── Booking.jsx
-│   │   │   ├── BookingConfirmation.jsx
-│   │   │   ├── BookingHistory.jsx
-│   │   │   ├── Tickets.jsx
-│   │   │   ├── Notifications.jsx
-│   │   │   ├── OrganizerDashboard.jsx
-│   │   │   └── AdminDashboard.jsx
-│   │   │
 │   │   ├── services/
-│   │   │   └── api.js
-│   │   │
 │   │   ├── App.jsx
 │   │   ├── App.css
 │   │   └── index.css
-│   │
 │   └── package.json
-│
 ├── screenshots/
-│
 └── README.md
 ```
-
----
-
-## 🔐 Module 1 — Authentication
-
-SmartEvent provides user authentication using JWT.
-
-### Features
-
-- User registration
-- User login
-- Password hashing
-- JWT access token generation
-- Protected API endpoints
-- User profile endpoint
-- Frontend authentication state
-- Protected React routes
-
-### Authentication APIs
-
-```text
+🔐 Authentication
+SmartEvent uses JWT authentication and password hashing.
+Features include: - Registration and login - JWT access-token
+generation - Protected API endpoints and frontend routes - Role-based
+access for `USER`, `ORGANIZER`, and `ADMIN`
+Authentication endpoints:
+``` text
 POST /auth/register
 POST /auth/login
 GET  /auth/profile
 ```
-
----
-
-## 🎫 Module 2 — Event Discovery
-
-Users can discover and explore available events.
-
-### Event Information
-
-Each event can contain:
-
-- Title and description
-- Category
-- Location
-- Event date
-- Ticket price
-- Available ticket count
-- Banner image
-- Created date
-
-### Event Categories
-
-- Music
-- Tech
-- Sports
-- Business
-
-### Event APIs
-
-```text
-POST /events
+🎫 Event Discovery
+Users can browse events and view details such as title, description,
+category, location, date, price, available tickets, and banner image.
+Discovery features include: - Event cards and event details - Search -
+Category and location filtering - Date filtering - Sorting - Ticket
+availability display
+Common event endpoints:
+``` text
 GET  /events
 GET  /events/{event_id}
 GET  /events/category/{category}
 GET  /events/search?query={query}
+POST /events
 ```
-
-### Frontend Features
-
-- Event cards
-- Event images
-- Event search
-- Category filtering
-- Event details page
-- Ticket availability display
-
----
-
-## 🎟️ Module 3 — Ticket Booking
-
-Authenticated users can book tickets for available events.
-
-### Features
-
-- Select ticket quantity
-- Validate ticket availability
-- Prevent booking when tickets are insufficient
-- Automatically calculate total price
-- Confirm bookings
-- Update available ticket count
-- View booking history
-
-### Booking APIs
-
-```text
+🎟️ Booking, Coupons, and Payments
+Authenticated users can select ticket quantities and create bookings.
+The application checks ticket availability and calculates the booking
+amount.
+Features include: - Ticket quantity selection and availability
+validation - Booking history - Coupon validation and discount
+calculation - Stripe Checkout integration for payment - Payment status
+display - Booking and payment notifications
+Booking endpoints:
+``` text
 POST /bookings
 GET  /bookings
 ```
-
-The total price is calculated using:
-
-```text
-Total Price = Ticket Price × Ticket Quantity
-```
-
-Bookings are associated with the authenticated user.
-
----
-
-## 📱 Module 4 — QR Tickets
-
-After a successful booking, SmartEvent generates a unique ticket.
-
-### Features
-
-- Unique ticket ID
-- Unique ticket code
-- QR code generation
-- QR image storage
-- Ticket display for users
-
-### Ticket API
-
-```text
+Payment configuration: Configure Stripe credentials in the backend
+environment file using the variable names expected by the backend code.
+Use Stripe test credentials for development. Never commit secret keys,
+access tokens, passwords, or real payment credentials to GitHub.
+🎟️ Digital QR Tickets
+The application provides digital tickets associated with bookings.
+Features include: - Unique ticket IDs and ticket codes - QR code
+generation and image storage - A My Tickets page for viewing digital
+tickets - QR codes available for verification
+Ticket endpoint:
+``` text
 GET /tickets
 ```
-
-Example ticket code:
-
-```text
+Example ticket-code format:
+``` text
 SMARTEVENT-XXXXXXXX
 ```
-
-QR codes are generated automatically after booking confirmation.
-
----
-
-## 🔔 Module 5 — Notifications
-
-Users receive notifications related to their bookings and relevant event updates.
-
-### Features
-
-- Notification title and message
-- Notification type
-- Read and unread status
-- Created date
-- Booking confirmation notifications
-- Event update notifications
-- Event cancellation notifications
-
-### Notification APIs
-
-```text
+🔔 Notifications
+Users can view notifications related to bookings, payments, and event
+updates.
+Features include: - Notification title and message - Notification type -
+Read/unread status - Created date - Booking and payment notifications -
+Event update and cancellation notifications - Mark a notification as
+read or mark all as read
+Notification endpoints:
+``` text
 GET   /notifications
+GET   /notifications/unread-count
 PATCH /notifications/{notification_id}/read
+PATCH /notifications/read-all
 ```
-
-Users can view their notifications and mark them as read from the frontend.
-
----
-
-## ⚛️ Module 6 — React Frontend
-
-The frontend is developed using React and Vite.
-
-### Pages
-
-- Register
-- Login
-- Home
-- Event Details
-- Booking
-- Booking Confirmation
-- Booking History
-- Tickets
-- Notifications
-
-### Components
-
-- Navbar
-- EventCard
-- ProtectedRoute
-
-### Features
-
-- Responsive user interface
-- Event cards with images
-- Search and filtering
-- Authentication forms
-- Protected routes
-- Ticket booking
-- Booking confirmation
-- Booking history
-- QR ticket display
-- Notifications
-- Loading states
-- Error handling
-
----
-
-## 👥 Module 7 — Role-Based Access Control
-
-SmartEvent uses role-based access control to manage permissions.
-
-### Roles
-
-- **USER** — Browse events, book tickets, view tickets, and manage personal notifications.
-- **ORGANIZER** — Manage permitted events and access organizer-related information.
-- **ADMIN** — Access administrative functionality and analytics.
-
-### Features
-
-- User roles
-- JWT-based authentication
-- Role-based endpoint protection
-- Protected frontend routes
-- Access control for restricted operations
-
----
-
-## 🗓️ Module 8 — Organizer Event Management
-
-Organizers can manage their events through the organizer functionality.
-
-### Features
-
-- View organizer events
-- Create and manage permitted events
-- Update event information
-- View event-related bookings
-- Access organizer-specific information
-
-Organizer operations are protected according to the user's role.
-
----
-
-## 📊 Module 9 — Organizer Dashboard and Insights
-
-The organizer dashboard provides an overview of event performance.
-
-### Features
-
-- Organizer dashboard
-- Event-related booking information
-- Ticket and booking insights
-- Event performance overview
-
-The dashboard helps organizers review information related to their events.
-
----
-
-## 🔄 Module 10 — Event Status Management
-
-SmartEvent supports event status tracking and event update notifications.
-
-### Event Statuses
-
-- UPCOMING
-- ONGOING
-- COMPLETED
-- CANCELLED
-
-### Features
-
-- Manage event status
-- Track event progress
-- Display event status on the event details page
-- Handle cancelled events
-- Prevent ticket booking for cancelled events
-- Create notifications for relevant event updates and cancellations
-
-This module helps users understand the current status of an event before booking tickets.
-
----
-
-## 🛡️ Module 11 — Admin Dashboard and Analytics
-
-The admin dashboard provides an overview of SmartEvent activity.
-
-### Dashboard Statistics
-
-- Total users
-- Total events
-- Total bookings
-- Tickets sold
-- Total revenue
-
-### Analytics
-
-- Daily ticket sales
-- Date-based sales filtering
-- Monthly booking trends
-- Popular events
-- Top revenue-generating events
-- User information
-- Event information
-- Booking information
-
-### Features
-
-- Admin-only dashboard access
-- Summary statistics
-- Sales analytics
-- Booking trends
-- Event performance information
-- Date filters and reset functionality
-
-The dashboard helps administrators monitor event booking activity and overall platform performance.
-
----
-
-## 🗄️ Database
-
-SmartEvent uses SQLite with SQLAlchemy for database operations.
-
-### Main Tables
-
-**User**
-
-Stores registered user information, roles, and hashed passwords.
-
-**Event**
-
-Stores event details, pricing, available ticket count, and event status.
-
-**Booking**
-
-Stores booking information, ticket quantity, and total price.
-
-**Ticket**
-
-Stores unique ticket codes and QR code information.
-
-**Notification**
-
-Stores user notifications and their read/unread status.
-
----
-
-## 🔒 Security
-
-The application includes the following security features:
-
-- JWT-based authentication
-- Password hashing
-- Protected API endpoints
-- Role-based access control
-- User-specific booking history
-- User-specific tickets and notifications
-- Pydantic input validation
-- Environment variables for sensitive configuration
-- HTTP error handling
-
----
-
-## ⚙️ Backend Setup
-
-### 1. Open the backend folder
-
-```bash
-cd SmartEvent/backend
-```
-
-### 2. Create and activate a virtual environment
-
-For Windows PowerShell:
-
-```powershell
+👥 Organizer and Admin Modules
+Organizer dashboard
+View organizer events
+Create and update permitted events
+Review event-related bookings and insights
+Manage event status where permitted
+Event status management
+Supported statuses include: - `UPCOMING` - `ONGOING` - `COMPLETED` -
+`CANCELLED`
+Cancelled events are handled in the booking flow, and relevant event
+updates can generate notifications.
+Admin dashboard
+The admin dashboard includes summaries and analytics for users, events,
+bookings, tickets sold, and revenue. It can also display sales trends,
+booking trends, popular events, and date-filtered information.
+🗄️ Database
+SmartEvent uses SQLite with SQLAlchemy.
+Main data models include: - User: account information, role, and
+hashed password - Event: event details, price, available tickets,
+and status - Booking: booking information, quantity, and total
+amount - Ticket: unique ticket codes and QR information -
+Notification: user notifications and read/unread status -
+Payment: payment-related information, depending on the backend model
+implementation
+🔒 Security Notes
+Password hashing
+JWT authentication
+Protected API endpoints
+Role-based access control
+User-specific booking, ticket, and notification access
+Pydantic input validation
+Environment-based configuration for secrets
+HTTP error handling
+Do not upload `.env` files or real credentials to the repository.
+⚙️ Setup and Run
+Prerequisites
+Python installed
+Node.js and npm installed
+1. Start the backend
+Open PowerShell or a terminal in the project folder:
+``` powershell
+cd backend
 python -m venv venv
 .\venv\Scripts\Activate.ps1
-```
-
-### 3. Install dependencies
-
-```bash
 pip install -r requirements.txt
 ```
-
-### 4. Configure environment variables
-
-Create a `.env` file inside the backend folder.
-
-Example configuration:
-
-```env
+Create a `backend/.env` file and set the database URL, a secure secret
+key, and the other configuration variables required by the application.
+For example:
+``` env
 DATABASE_URL=sqlite:///./smartevent.db
-SECRET_KEY=your_secret_key_here
+SECRET_KEY=replace_with_a_secure_random_secret
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 ```
-
-Use your own secure secret key. Do not upload real passwords, tokens, or secret keys to GitHub.
-
-### 5. Start the FastAPI server
-
-```bash
+Also add the Stripe environment variables required by your backend
+implementation. Keep all real secret values private.
+Start FastAPI:
+``` powershell
 uvicorn app.main:app --reload
 ```
-
-The backend will run at:
-
-```text
+Backend base URL:
+``` text
 http://127.0.0.1:8000
 ```
-
----
-
-## 📖 API Documentation
-
-FastAPI provides interactive API documentation through Swagger UI.
-
-Open the following URL after starting the backend:
-
-```text
+Interactive API documentation:
+``` text
 http://127.0.0.1:8000/docs
 ```
-
-Use Swagger UI to explore and test the available API endpoints.
-
----
-
-## ⚛️ Frontend Setup
-
-### 1. Open the frontend folder
-
-```bash
-cd SmartEvent/frontend
-```
-
-### 2. Install dependencies
-
-```bash
+2. Start the frontend
+Open a second terminal:
+``` powershell
+cd frontend
 npm install
-```
-
-### 3. Start the React development server
-
-```bash
 npm run dev
 ```
-
-The frontend will usually run at:
-
-```text
+Open the URL printed by Vite, usually:
+``` text
 http://localhost:5173
 ```
-
----
-
-## 🔄 Application Flow
-
-The main user flow is:
-
-```text
-Register
-   ↓
-Login
-   ↓
-JWT Authentication
-   ↓
-Browse Events
-   ↓
-Search and Filter Events
-   ↓
+🔄 Main User Flow
+``` text
+Register / Login
+       ↓
+Browse, Search, and Filter Events
+       ↓
 View Event Details
-   ↓
+       ↓
 Select Tickets
-   ↓
+       ↓
+Apply Coupon (optional)
+       ↓
 Confirm Booking
-   ↓
-Booking Created
-   ↓
-QR Ticket Generated
-   ↓
-Notification Created
-   ↓
-View Ticket and Booking History
-   ↓
-View Notifications
+       ↓
+Complete Stripe Checkout
+       ↓
+View Booking and Payment Status
+       ↓
+Access Digital Ticket and QR Code
+       ↓
+Receive and View Notifications
 ```
-
-Organizers can access their permitted event management and dashboard features. Administrators can access the admin dashboard and analytics.
-
----
-
-## 🧪 Testing
-
-The backend APIs were tested using FastAPI Swagger documentation.
-
-### Functionality Tested
-
-- User registration and login
-- JWT authentication
-- Protected endpoints
-- Role-based access
-- Event creation and listing
-- Event details
-- Category filtering and event search
-- Ticket booking
-- Ticket availability validation
-- Booking history
-- QR ticket generation
-- User notifications
-- Marking notifications as read
-- Organizer dashboard
-- Event status management
-- Admin analytics
-- Daily ticket sales filtering
-- Monthly booking trends
-- Popular events and revenue information
-
-The React frontend was also tested for the main user pages, event booking flow, organizer dashboard, event details, and admin dashboard.
-
----
-
-## 📸 Project Evidence
-
-Screenshots of API testing and frontend functionality are stored in the `screenshots/` folder.
-
-The screenshots provide evidence of the different SmartEvent modules, including authentication, event discovery, booking, QR tickets, notifications, organizer functionality, event status management, and admin analytics.
-
----
-
-## 🚀 Future Enhancements
-
-Possible future improvements include:
-
-- Online payment integration
-- Automated event reminders
-- Email notifications
-- Ticket cancellation and refunds
-- Advanced event recommendations
-- PostgreSQL database support
-- Cloud deployment
-- Production environment configuration
-
----
-
-## 👩‍💻 Project Details
-
-**Project Name:** SmartEvent  
-**Project Type:** Event Discovery and Ticket Booking System  
-**Backend:** FastAPI and Python  
-**Frontend:** React and Vite  
-**Database:** SQLite  
-**ORM:** SQLAlchemy  
-**Authentication:** JWT  
-**Ticket System:** QR-based tickets  
-
-GitHub Repository: https://github.com/akhilaakhilaa/SmartEvent
+🧪 Testing
+The following user-facing flows were manually checked during
+development: - Home page and event cards - Event details navigation -
+Event search and filters - Booking page and coupon validation - Stripe
+test checkout - Booking history - Digital ticket display and ticket
+codes - QR code display - Notifications, including payment
+confirmation - Mobile layout
+Backend endpoints and organizer/admin functionality should also be
+tested in the target environment before a release. A successful
+test-mode Stripe payment does not mean the application is configured for
+live payments.
+📸 Screenshots
+Project screenshots are stored in the `screenshots/` folder. The Module
+17 screenshots include:
+`Module17_01_Home_Page_Top.png`
+`Module17_02_Event_Cards.png`
+`Module17_03_Event_Details.png`
+`Module17_04_Booking_Page.png`
+`Module17_05_Booking_Confirmation.png`
+`Module17_06_Booking_History.png`
+`Module17_07_My_Tickets.png`
+`Module17_08_Notifications.png`
+`Module17_11_Mobile_View.png`
+Make sure the filenames above match the actual files in your
+`screenshots/` folder before committing the README.
+🚀 Possible Future Enhancements
+Email notifications and automated event reminders
+Ticket cancellation and refund workflows
+More advanced event recommendations
+PostgreSQL support
+Cloud deployment and production configuration
+Additional automated tests
+👩‍💻 Project Details
+Project name: SmartEvent
+Project type: Event Discovery and Ticket Booking System
+Backend: Python and FastAPI
+Frontend: React and Vite
+Database: SQLite
+ORM: SQLAlchemy
+Authentication: JWT
+Payments: Stripe Checkout (test mode tested)
+Tickets: Digital tickets with QR codes
+GitHub repository: https://github.com/akhilaakhilaa/SmartEvent
