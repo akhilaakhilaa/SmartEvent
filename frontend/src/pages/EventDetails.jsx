@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
+import EventAnnouncements from "../components/EventAnnouncements";
 
 function EventDetails() {
   const { eventId } = useParams();
@@ -10,7 +11,8 @@ function EventDetails() {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const [availableTickets, setAvailableTickets] = useState(null);
+  const [liveConnected, setLiveConnected] = useState(false);
   const eventImages = {
     1: "/events/tech-meetup.png",
     2: "/events/music-night.png",
@@ -34,6 +36,47 @@ function EventDetails() {
 
     fetchEvent();
   }, [eventId]);
+  useEffect(() => {
+  if (!eventId) return;
+
+  const wsProtocol =
+    window.location.protocol === "https:" ? "wss" : "ws";
+
+  const socket = new WebSocket(
+    `${wsProtocol}://127.0.0.1:8000/ws/events/${eventId}/availability`
+  );
+
+  socket.onopen = () => {
+    setLiveConnected(true);
+  };
+
+  socket.onmessage = (message) => {
+    try {
+      const data = JSON.parse(message.data);
+
+      if (
+        data.type === "availability_update" &&
+        Number(data.event_id) === Number(eventId)
+      ) {
+        setAvailableTickets(data.available_tickets);
+      }
+    } catch {
+      console.error("Invalid availability update received.");
+    }
+  };
+
+  socket.onclose = () => {
+    setLiveConnected(false);
+  };
+
+  socket.onerror = () => {
+    setLiveConnected(false);
+  };
+
+  return () => {
+    socket.close();
+  };
+}, [eventId]);
 
   if (loading) {
     return (
@@ -128,7 +171,8 @@ function EventDetails() {
             <p>💰 ₹{event.ticket_price}</p>
 
             <p>
-              🎟️ {event.available_tickets} tickets available
+              🎟️ {availableTickets ?? event.available_tickets} tickets available
+              {liveConnected ? " 🟢 Live" : " ⚪ Connecting…"}
             </p>
           </div>
 
@@ -138,7 +182,7 @@ function EventDetails() {
             disabled={
               isCancelled ||
               event.event_status === "COMPLETED" ||
-              event.available_tickets <= 0
+              (availableTickets ?? event.available_tickets) <= 0
             }
           >
             {isCancelled
@@ -151,6 +195,11 @@ function EventDetails() {
           </button>
         </div>
       </div>
+
+      <EventAnnouncements
+        eventId={event.id}
+        organizerId={event.organizer_id}
+      />
     </div>
   );
 }

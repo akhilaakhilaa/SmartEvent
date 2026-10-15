@@ -30,6 +30,11 @@ class User(Base):
         default="USER"
     )
 
+    profile_picture = Column(
+        String(500),
+        nullable=True
+    )
+
     created_at = Column(
         DateTime,
         default=lambda: datetime.now(timezone.utc)

@@ -5,6 +5,8 @@ import Navbar from "./components/Navbar";
 import AdminDashboard from "./pages/AdminDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import OrganizerDashboard from "./pages/OrganizerDashboard";
+import Wishlist from "./pages/Wishlist";
+import { WishlistProvider } from "./context/WishlistContext";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -15,9 +17,11 @@ import BookingConfirmation from "./pages/BookingConfirmation";
 import BookingHistory from "./pages/BookingHistory";
 import Tickets from "./pages/Tickets";
 import Notifications from "./pages/Notifications";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
+    <WishlistProvider>
     <>
       <Navbar />
 
@@ -35,6 +39,14 @@ function App() {
         <Route
           path="/organizer/dashboard"
           element={<OrganizerDashboard />}
+        />
+        <Route
+          path="/wishlist"
+          element={
+              <ProtectedRoute>
+              <Wishlist />
+              </ProtectedRoute>
+             }
         />
 
         <Route
@@ -74,7 +86,11 @@ function App() {
         />
         <Route
           path="/admin/dashboard"
-          element={<AdminDashboard />}
+          element={
+            <ProtectedRoute requiredRole="ADMIN">
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
         />
 
         <Route
@@ -87,11 +103,21 @@ function App() {
         />
 
         <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="*"
           element={<Navigate to="/" replace />}
         />
       </Routes>
     </>
+  </WishlistProvider>
   );
 }
 

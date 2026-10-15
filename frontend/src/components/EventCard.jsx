@@ -1,11 +1,16 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useWishlist } from "../context/WishlistContext";
 
 function EventCard({ event }) {
   const navigate = useNavigate();
   const [imageFailed, setImageFailed] = useState(false);
+  const { savedIds, loading, toggleWishlist } = useWishlist();
+const [wishlistLoading, setWishlistLoading] = useState(false);
+const [wishlistMessage, setWishlistMessage] = useState("");
 
+const isSaved = savedIds.has(event.id);
   const eventImages = {
     1: "/events/tech-meetup.png",
     2: "/events/music-night.png",
@@ -21,6 +26,29 @@ function EventCard({ event }) {
       })
     : "Date to be announced";
 
+async function handleWishlistClick() {
+  if (wishlistLoading || loading) return;
+
+  setWishlistLoading(true);
+  setWishlistMessage("");
+
+  try {
+    await toggleWishlist(event.id);
+    setWishlistMessage(
+      isSaved ? "Removed from wishlist" : "Saved to wishlist!"
+    );
+  } catch (error) {
+    setWishlistMessage(
+      error.response?.data?.detail ||
+        (error.response?.status === 401
+          ? "Please log in to save events."
+          : "Could not update wishlist. Please try again.")
+    );
+  } finally {
+    setWishlistLoading(false);
+  }
+}
+
   return (
     <article className="event-card">
       <div className="event-image-container">
@@ -33,7 +61,11 @@ function EventCard({ event }) {
             onError={() => setImageFailed(true)}
           />
         ) : (
-          <div className="event-image-fallback" role="img" aria-label="Event image unavailable">
+          <div
+            className="event-image-fallback"
+            role="img"
+            aria-label="Event image unavailable"
+          >
             <span aria-hidden="true">🎉</span>
             <p>SmartEvent</p>
           </div>
@@ -48,7 +80,8 @@ function EventCard({ event }) {
         <h3>{event.title}</h3>
 
         <p className="event-description">
-          {event.description || "Discover this exciting event with SmartEvent."}
+          {event.description ||
+            "Discover this exciting event with SmartEvent."}
         </p>
 
         <div className="event-meta">
@@ -73,13 +106,35 @@ function EventCard({ event }) {
           </span>
         </div>
 
-        <button
-          type="button"
-          className="details-button"
-          onClick={() => navigate(`/events/${event.id}`)}
-        >
-          View Details <span aria-hidden="true">→</span>
-        </button>
+        <div className="event-actions">
+          <button
+            type="button"
+            className="details-button"
+            onClick={() => navigate(`/events/${event.id}`)}
+          >
+            View Details <span aria-hidden="true">→</span>
+          </button>
+
+          <button
+            type="button"
+            className="wishlist-button"
+            onClick={handleWishlistClick}
+            disabled={wishlistLoading || loading}
+            aria-pressed={isSaved}
+          >
+            {wishlistLoading
+              ? "Please wait..."
+              : isSaved
+                ? "♥ Saved"
+                : "♡ Save"}
+          </button>
+        </div>
+
+        {wishlistMessage && (
+          <p className="wishlist-message" role="status">
+            {wishlistMessage}
+          </p>
+        )}
       </div>
     </article>
   );

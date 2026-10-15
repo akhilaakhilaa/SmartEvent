@@ -17,8 +17,9 @@ env/
 *.sqlite
 *.sqlite3
 
-# Generated QR codes
-backend/app/static/qr/*.png
+# Generated uploads and QR codes
+backend/app/static/qr/
+backend/app/static/profiles/
 
 # Node
 node_modules/

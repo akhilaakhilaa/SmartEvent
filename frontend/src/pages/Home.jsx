@@ -5,6 +5,8 @@ import EventCard from "../components/EventCard";
 
 function Home() {
   const [events, setEvents] = useState([]);
+  const [recommendations, setRecommendations] = useState([]);
+  const [recommendationsLoading, setRecommendationsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [location, setLocation] = useState("");
@@ -62,6 +64,40 @@ function Home() {
     fetchEvents();
   }, [fetchEvents]);
 
+  useEffect(() => {
+  let active = true;
+
+  const fetchRecommendations = async () => {
+    try {
+      const response = await api.get("/recommendations/");
+
+      if (active) {
+        setRecommendations(response.data.recommendations || []);
+      }
+    } catch (err) {
+      console.error(
+        "Failed to load recommendations:",
+        err.response?.status,
+        err.response?.data || err.message
+      );
+
+      if (active) {
+        setRecommendations([]);
+      }
+    } finally {
+      if (active) {
+        setRecommendationsLoading(false);
+      }
+    }
+  };
+
+  fetchRecommendations();
+
+  return () => {
+    active = false;
+  };
+}, []);
+
   const handleClear = () => {
     setSearch("");
     setCategory("");
@@ -85,6 +121,35 @@ function Home() {
 
   return (
     <div className="home-page">
+<section className="events-section recommendations-section">
+  <div className="events-heading">
+    <h2>Recommended for You ✨</h2>
+    {!recommendationsLoading && (
+      <span>{recommendations.length} recommendations</span>
+    )}
+  </div>
+
+  {recommendationsLoading ? (
+    <p>Finding events based on your interests...</p>
+  ) : recommendations.length > 0 ? (
+    <div className="events-grid">
+      {recommendations.map((event) => (
+        <div key={event.id} className="recommended-event">
+          <EventCard event={event} />
+          <p className="recommendation-reason">
+            {event.reason || "Explore this event"}
+          </p>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p className="recommendations-empty">
+      No personalized recommendations yet. Explore upcoming events
+      and book or review events to help us personalize your suggestions.
+    </p>
+  )}
+</section>
+
       <section className="home-hero">
         <p className="hero-eyebrow">FIND YOUR NEXT EXPERIENCE</p>
         <h1>Discover events you'll love 🎉</h1>

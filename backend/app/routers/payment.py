@@ -4,12 +4,15 @@ import uuid
 from decimal import Decimal, ROUND_HALF_UP
 
 import stripe
-from fastapi import APIRouter, Depends, HTTPException, Query
+
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+
 
 from app.auth.dependencies import get_current_user
 from app.database.connection import get_db
 from app.models.booking import Booking
+from app.utils.availability_manager import availability_manager
 from datetime import datetime, timezone
 from app.models.coupon import Coupon
 from app.models.event import Event
@@ -97,6 +100,7 @@ def confirm_paid_booking(
     if existing_ticket:
         payment.payment_status = "SUCCESS"
         booking.booking_status = "CONFIRMED"
+        # Save ticket, payment, booking, coupon usage and inventory together.
         db.commit()
         db.refresh(payment)
         return payment
@@ -718,6 +722,7 @@ def create_stripe_checkout(
 
 @router.get("/verify", response_model=PaymentResponse)
 def verify_stripe_checkout(
+    background_tasks: BackgroundTasks,
     session_id: str = Query(..., min_length=10),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -830,12 +835,27 @@ def verify_stripe_checkout(
         )
 
     try:
-        return confirm_paid_booking(
+        result = confirm_paid_booking(
             db=db,
             payment=payment,
             booking=booking,
             user_id=current_user.id
         )
+
+        available_tickets = (
+            db.query(Event.available_tickets)
+            .filter(Event.id == booking.event_id)
+            .scalar()
+        )
+
+        if available_tickets is not None:
+            background_tasks.add_task(
+                availability_manager.broadcast,
+                booking.event_id,
+                available_tickets
+            )
+
+        return result
 
     except HTTPException:
         db.rollback()
@@ -863,6 +883,7 @@ def verify_stripe_checkout(
 def simulate_payment(
     payment_id: int,
     outcome: str,
+    background_tasks: BackgroundTasks,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -942,12 +963,27 @@ def simulate_payment(
         return payment
 
     try:
-        return confirm_paid_booking(
+        result = confirm_paid_booking(
             db=db,
             payment=payment,
             booking=booking,
             user_id=current_user.id
         )
+
+        available_tickets = (
+            db.query(Event.available_tickets)
+            .filter(Event.id == booking.event_id)
+            .scalar()
+        )
+
+        if available_tickets is not None:
+            background_tasks.add_task(
+                availability_manager.broadcast,
+                booking.event_id,
+                available_tickets
+            )
+
+        return result
 
     except HTTPException:
         db.rollback()
@@ -957,7 +993,10 @@ def simulate_payment(
         db.rollback()
         raise HTTPException(
             status_code=500,
-            detail="Payment processing failed. Check the payment status."
+            detail=(
+                "Payment verification succeeded, but booking confirmation "
+                "needs attention."
+            )
         ) from exc
 
 
