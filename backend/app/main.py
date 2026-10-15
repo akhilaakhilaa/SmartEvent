@@ -40,6 +40,7 @@ from app.auth.router import router as auth_router
 from app.routers import review
 from app.routers import wishlist
 from app.routers import announcement
+from app.routers import chatbot as chatbot_router
 from app.routers.event import router as event_router
 from app.routers.booking import router as booking_router
 from app.routers.ticket import router as ticket_router
@@ -78,6 +79,7 @@ app.include_router(review.router)
 app.include_router(recommendation_router)
 app.include_router(wishlist.router)
 app.include_router(announcement.router)
+app.include_router(chatbot_router.router)
 
 # Serve QR ticket images.
 STATIC_DIR = BACKEND_DIR / "app" / "static"

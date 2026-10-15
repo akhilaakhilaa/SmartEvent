@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
@@ -9,6 +10,32 @@ from app.models.user import User
 
 
 security = HTTPBearer()
+security_optional = HTTPBearer(auto_error=False)
+
+
+def get_optional_current_user(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security_optional),
+    db: Session = Depends(get_db)
+) -> Optional[User]:
+    if not credentials or not credentials.credentials:
+        return None
+
+    token = credentials.credentials
+    try:
+        payload = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM]
+        )
+        user_id = payload.get("sub")
+        if user_id is None:
+            return None
+        user_id = int(user_id)
+    except (JWTError, ValueError):
+        return None
+
+    return db.query(User).filter(User.id == user_id).first()
+
 
 
 def get_current_user(

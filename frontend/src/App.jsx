@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
 
 import Navbar from "./components/Navbar";
+import ChatbotWidget from "./components/ChatbotWidget";
 import AdminDashboard from "./pages/AdminDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import OrganizerDashboard from "./pages/OrganizerDashboard";
@@ -116,6 +117,8 @@ function App() {
           element={<Navigate to="/" replace />}
         />
       </Routes>
+
+      <ChatbotWidget />
     </>
   </WishlistProvider>
   );

@@ -24,6 +24,8 @@ Built with **React, FastAPI, SQLAlchemy, and SQLite**, SmartEvent includes JWT a
 - Receive real-time ticket availability updates
 - Discover personalized event recommendations
 - View event announcements, including pinned announcements
+- Conversational AI chatbot assistant for event discovery, bookings, tickets, and FAQs
+
 
 ### 🎪 Organizer Features
 
@@ -290,6 +292,72 @@ PATCH /admin/events/{event_id}/status
 
 Additional endpoints support analytics, event and user listings, and booking management.
 
+## 🤖 AI Chatbot Assistant — Module 24
+
+SmartEvent includes a conversational AI chatbot assistant designed to guide attendees, help discover events, look up bookings and tickets, and answer platform-wide questions.
+
+### Capabilities and Supported Intents
+
+- **Event Discovery by Location:** Find upcoming events near the user or in specific cities (e.g., *"Find events near me"*, *"Events in Hyderabad"*).
+- **Music & Weekend Suggestions:** Discover concerts and weekend entertainment with direct event card previews (e.g., *"Suggest music events this weekend"*).
+- **Booking Tracking:** Check recent orders, ticket quantities, payment status, and order totals (e.g., *"Show my bookings"*).
+- **Digital Tickets & QR Codes:** Inspect digital tickets, ticket codes, and instructions for venue check-in (e.g., *"Show my tickets"*).
+- **Ticket Troubleshooting:** Step-by-step guidance for missing tickets, QR code display, and organizer contacts (e.g., *"Help with ticket issues"*).
+- **Platform FAQs & Navigation:** Detailed instructions on booking steps, discount coupons, cancellations and refunds, profile management, wishlists, and organizer/admin portals.
+- **Personalized Recommendations:** Intelligent event recommendations utilizing category preferences from confirmed bookings and high ratings.
+
+### Security and Ownership Isolation
+
+- **Token-Based Identity:** Authenticated queries strictly derive identity from the verified JWT access token (`sub`), never from user IDs provided in chat messages.
+- **Cross-User Protection:** Users can only view their own private bookings and tickets.
+- **Unauthenticated Handling:** Unauthenticated users asking for personal bookings or tickets are prompted to log in without exposing system details or error traces.
+- **Input Validation:** Messages are validated using Pydantic ($1 \le \text{length} \le 1000$ characters) and empty/whitespace inputs are rejected with appropriate error statuses.
+
+### Endpoint
+
+```http
+POST /chatbot/message
+```
+
+**Request Body:**
+```json
+{
+  "message": "Find events near me"
+}
+```
+
+**Response Body:**
+```json
+{
+  "reply": "### 📍 Upcoming Events...",
+  "intent": "events_location",
+  "events": [
+    {
+      "id": 1,
+      "title": "Hyderabad Tech Summit 2026",
+      "category": "Tech",
+      "location": "HICC, Hyderabad",
+      "event_date": "2026-12-15T10:00:00",
+      "ticket_price": 999.0,
+      "available_tickets": 96,
+      "banner_image": null
+    }
+  ],
+  "action": "navigate",
+  "quick_replies": ["Music This Weekend", "Trending Events", "Show My Bookings"]
+}
+```
+
+### Frontend Widget
+
+The frontend includes a floating chat widget (`ChatbotWidget.jsx`) available across all pages:
+- Floating launcher button with online pulse indicator at the bottom-right.
+- Expandable chat dialog with rich Markdown formatting, bold headings, and clickable internal navigation links.
+- Interactive event cards with direct links to event details (`/events/:id`).
+- Quick-suggestion chips enabling 1-click queries.
+- Typing animation indicator while awaiting responses.
+
+
 ## 🎟️ Booking, Payments, and Digital Tickets
 
 Authenticated users can select ticket quantities, create bookings, apply eligible coupons, and proceed through checkout.
@@ -543,7 +611,14 @@ Existing screenshots from earlier modules include examples such as:
 - `Module23_Bookings.png`
 - `Module23_Bookings_Pagination.png`
 
+### Module 24 — AI Chatbot Assistant
+
+- `Module24_Chatbot_Widget.png`
+- `Module24_Chatbot_Event_Discovery.png`
+- `Module24_Chatbot_My_Bookings.png`
+
 Only retain screenshot references that match actual files in the repository.
+
 
 ## 🔒 Security Notes
 
